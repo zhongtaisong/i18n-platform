@@ -1,5 +1,5 @@
 {
-  "name": "i18n",
+  "name": "i18n-platform",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
