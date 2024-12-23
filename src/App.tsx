@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, Form, Input, message, Modal, Radio, Row, Space, Spin, Table, } from 'antd';
+import { Button, Col, Form, Input, message, Modal, Radio, Row, Space, Spin, Table, } from 'antd';
 import { fanyiBaiDuFn, languageBulkWriteFn, languageDeleteManyFn, languageExportFn, languageListFn } from './webapi';
 import { LANGUAGE_LIST, PAGE_SIZE } from './data';
 import './App.css';
@@ -17,6 +17,8 @@ export default function App() {
   });
   const isUseEffect = useRef(false);
   const [saveStatus, setSaveStatus] = useState<IObject>({});
+  const [form] = Form.useForm();
+  const [isBtnLoading, setIsBtnLoading] = useState(false);
 
   useEffect(() => {
     if(isUseEffect?.current) return;
@@ -254,17 +256,44 @@ export default function App() {
         spinning={ isSpinning }
       >
         <div className='language_app'>
-          <Space className='language_app__top'>
-            <Button
-              type="primary"
-              onClick={() => setVisible(true)}
-            >新增行</Button>
+          <Form
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            autoComplete="off"
+            layout="inline"
+            onFinish={values => {
+              /** 查询语言列表 - 操作 */
+              getLanguageListFn({
+                pageNum: 0,
+                ...values,
+              });
+            }}
+            labelWrap
+          >
+            <Form.Item label="中文" name="zh">
+              <Input placeholder="请输入" />
+            </Form.Item>
 
-            <Button
-              type="primary"
-              onClick={() => setExportVisible(true)}
-            >导出</Button>
-          </Space>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                搜索
+              </Button>
+            </Form.Item>
+
+            <Form.Item>
+              <Space className='language_app__top'>
+                <Button
+                  type="primary"
+                  onClick={() => setVisible(true)}
+                >新增行</Button>
+
+                <Button
+                  type="primary"
+                  onClick={() => setExportVisible(true)}
+                >导出</Button>
+              </Space>
+            </Form.Item>
+          </Form>
 
           <Table
             dataSource={ dataSource }
@@ -394,6 +423,7 @@ export default function App() {
             clearOnDestroy
             autoComplete="off"
             onFinish={(values) => onAddRowClick(values)}
+            form={ form }
           >
             { dom }
           </Form>
@@ -404,15 +434,49 @@ export default function App() {
             return (
               <Form.Item
                 key={ item?.language }
-                label={ item?.title }
+                label={
+                  item?.language !== 'zh' ? (
+                    <Row>
+                      <Col span={ 12 }>{ item?.title }</Col>
+                      <Col span={ 12 }>
+                        <Button 
+                          type="primary" 
+                          size="small"
+                          loading={ isBtnLoading }
+                          onClick={async () => {
+                            const text = form?.getFieldValue("zh") as string;
+                            if(!text?.trim?.()) {
+                              return form.validateFields(["zh"]);
+                            };
+                            
+                            setIsBtnLoading(true);
+                            const result = await fanyiBaiDuFn({
+                              text,
+                              language: item?.language,
+                            }).finally(() => {
+                              setTimeout(() => {
+                                setIsBtnLoading(false);
+                              }, 360);
+                            });
+
+                            form?.setFieldsValue({
+                              [item?.language]: result,
+                            });
+                          }}
+                        >翻译</Button>
+                      </Col>
+                    </Row>
+                  ) : item?.title
+                }
                 name={ item?.language }
                 rules={[{ 
-                  required: ["zh"].includes(item?.language),
-                  message: `请输入${ item?.title }`,
+                  required: true,
+                  whitespace: true,
+                  message: `请输入`,
                 }]}
               >
                 <Input.TextArea 
-                  placeholder={ `请输入${ item?.title }` }
+                  placeholder="请输入"
                 />
               </Form.Item>
             );
