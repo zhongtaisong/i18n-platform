@@ -45,11 +45,11 @@ export const languageListFn = async (params: IObject): Promise<Partial<IObject>>
  * 保存
  * @param list 
  */
-export const languageBulkWriteFn = async (list: Array<IObject>) => {
+export const languageBulkWriteFn = async (list: Array<IObject>, action: Ii18nAction) => {
     let context = false;
 
     try {
-        const result = await i18nAxios.post<IResult>(`language/bulkWrite`, {
+        const result = await i18nAxios.post<IResult>(`language/bulkWrite/${ action || "" }`, {
             list,
         });
         

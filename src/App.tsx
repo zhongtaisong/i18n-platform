@@ -126,7 +126,7 @@ export default function App() {
     const result = await onSaveClick(false, {
       id: `${Date.now()}`,
       ...values,
-    });
+    }, "add");
 
     if(!result) return;
     
@@ -166,7 +166,7 @@ export default function App() {
    * @param isBatch 
    * @param params 
    */
-  const onSaveClick = (isBatch = false, params: IObject) => {
+  const onSaveClick = (isBatch = false, params: IObject, action: Ii18nAction) => {
     const list: IObject[] = [];
     if(!isBatch) {
       if(!params || !Object.keys(params).length) return;
@@ -181,7 +181,7 @@ export default function App() {
 
     /** 开启loading */
     onToggleSpinChange(true);
-    return languageBulkWriteFn(list).finally(() => {
+    return languageBulkWriteFn(list, action).finally(() => {
       /** 关闭loading */
       onToggleSpinChange(false);
       setSaveStatus(data => ({ ...data, [params?.id]: 0, }));
@@ -368,7 +368,7 @@ export default function App() {
                   <Space>
                     <Button
                       type={ saveStatus[row?.id] === 1 ? "primary" : "default" }
-                      onClick={() => onSaveClick(false, row)}
+                      onClick={() => onSaveClick(false, row, "update")}
                     >保存</Button>
 
                     <Button

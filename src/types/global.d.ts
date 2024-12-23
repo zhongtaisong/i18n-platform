@@ -12,6 +12,8 @@ declare global {
   declare interface Window {
     $wujie: IObject;
   }
+
+  declare type Ii18nAction = "add" | "update";
 }
 
 export {};
