@@ -257,8 +257,6 @@ export default function App() {
       >
         <div className='language_app'>
           <Form
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
             autoComplete="off"
             layout="inline"
             onFinish={values => {
@@ -271,7 +269,9 @@ export default function App() {
             labelWrap
           >
             <Form.Item label="中文" name="zh">
-              <Input placeholder="请输入" />
+              <Input placeholder="请输入" 
+                style={{ width: 360, }}
+              />
             </Form.Item>
 
             <Form.Item>
