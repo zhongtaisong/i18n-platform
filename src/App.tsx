@@ -396,7 +396,8 @@ export default function App() {
                 return (
                   <Space>
                     <Button
-                      type={ saveStatus[row?.id] === 1 ? "primary" : "default" }
+                      type="primary"
+                      disabled={ saveStatus[row?.id] !== 1 }
                       onClick={() => onSaveClick(false, row, "update")}
                     >保存</Button>
 
