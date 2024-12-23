@@ -16,6 +16,7 @@ export default function App() {
     pageSize: PAGE_SIZE,
   });
   const isUseEffect = useRef(false);
+  const [saveStatus, setSaveStatus] = useState<IObject>({});
 
   useEffect(() => {
     if(isUseEffect?.current) return;
@@ -103,6 +104,7 @@ export default function App() {
       onToggleSpinChange(false);
     });
 
+    setSaveStatus(data => ({ ...data, [id]: 1, }));
     setDataSource(data => {
       return data.map(item => {
         if(item?.id === id) {
@@ -145,6 +147,7 @@ export default function App() {
   const onTextAreaChange = (id: string, key: string, value: string) => {
     if(!id || !key) return;
 
+    setSaveStatus(data => ({ ...data, [id]: 1, }));
     setDataSource(data => {
       return data.map(item => {
         if(item?.id === id) {
@@ -181,6 +184,7 @@ export default function App() {
     return languageBulkWriteFn(list).finally(() => {
       /** 关闭loading */
       onToggleSpinChange(false);
+      setSaveStatus(data => ({ ...data, [params?.id]: 0, }));
     });
   }
 
@@ -334,6 +338,7 @@ export default function App() {
                           style={{ flex: 1, }}
                           placeholder={ `请输入${ item?.title }` }
                           onChange={(e) => onTextAreaChange?.(row?.id, language, e?.target?.value ?? "")}
+                          readOnly={ ["zh"].includes(language) }
                         />
           
                         {
@@ -362,7 +367,7 @@ export default function App() {
                 return (
                   <Space>
                     <Button
-                      type="primary"
+                      type={ saveStatus[row?.id] === 1 ? "primary" : "default" }
                       onClick={() => onSaveClick(false, row)}
                     >保存</Button>
 

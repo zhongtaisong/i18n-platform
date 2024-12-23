@@ -1,9 +1,25 @@
 import { message } from "antd";
 import axios from "axios";
+import { getTerminalFn, } from "./kit";
 
 const i18nAxios = axios.create({
     baseURL: 'http://127.0.0.1:8888/',
 });
+
+/** 请求拦截器 */
+i18nAxios.interceptors.request.use(
+    config => {
+        const headers = config?.headers;
+        if(headers && Object.keys(headers).length) {
+            Object.assign(headers, {
+                terminal: getTerminalFn(),
+            })
+        }
+
+        return config;
+    }, 
+    error => Promise.reject(error),
+);
 
 /** 成功响应码 */
 const SUCCESS_CODE = "000000";
@@ -111,6 +127,7 @@ export const languageExportFn = async (params: IObject) => {
     let context = false;
 
     try {
+        const terminal = getTerminalFn();
         const result = await i18nAxios.post(
             `language/export`, 
             {...params}, { 
@@ -120,7 +137,7 @@ export const languageExportFn = async (params: IObject) => {
         const url = window.URL.createObjectURL(result?.data);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${ params?.language || "" }-${ Date.now() }.json`;
+        a.download = `${ params?.language || "" }-${ terminal }.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

@@ -8,6 +8,10 @@ declare global {
     context: T;
     message: string;
   }
+
+  declare interface Window {
+    $wujie: IObject;
+  }
 }
 
 export {};
