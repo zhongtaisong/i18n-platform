@@ -1,6 +1,6 @@
 import { message } from "antd";
 import axios from "axios";
-import { getTerminalFn, } from "./kit";
+import { getLangFn, getTerminalFn, } from "./kit";
 
 const i18nAxios = axios.create({
     baseURL: 'http://127.0.0.1:8888/',
@@ -13,6 +13,7 @@ i18nAxios.interceptors.request.use(
         if(headers && Object.keys(headers).length) {
             Object.assign(headers, {
                 terminal: getTerminalFn(),
+                lang: getLangFn(),
             })
         }
 
